@@ -6,11 +6,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tps.challenge.R
+import com.tps.challenge.network.model.StoreResponse
 
 /**
  * A RecyclerView.Adapter to populate the screen with a store feed.
  */
-class StoreFeedAdapter: RecyclerView.Adapter<StoreItemViewHolder>() {
+class StoreFeedAdapter(val stores: List<StoreResponse>): RecyclerView.Adapter<StoreItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoreItemViewHolder {
         return StoreItemViewHolder(
@@ -20,17 +21,15 @@ class StoreFeedAdapter: RecyclerView.Adapter<StoreItemViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: StoreItemViewHolder, position: Int) {
-        TODO("Not yet implemented")
+        val store = stores[position]
 
         with(holder.itemView) {
-            findViewById<TextView>(R.id.name).text = TODO("provide store name")
-            findViewById<TextView>(R.id.description).text = TODO("provide store description")
+            findViewById<TextView>(R.id.name).text = store.name
+            findViewById<TextView>(R.id.description).text = store.description
         }
     }
 
-    override fun getItemCount(): Int {
-        TODO("Not yet implemented")
-    }
+    override fun getItemCount() = stores.size
 }
 
 /**

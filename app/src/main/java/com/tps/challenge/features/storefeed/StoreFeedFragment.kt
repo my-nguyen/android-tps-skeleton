@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tps.challenge.R
 import com.tps.challenge.TCApplication
+import com.tps.challenge.network.model.StoreResponse
 
 /**
  * Displays the list of Stores with its title, description and the cover image to the user.
@@ -36,13 +37,13 @@ class StoreFeedFragment : Fragment() {
         // Enable if Swipe-To-Refresh functionality will be needed
         swipeRefreshLayout.isEnabled = false
 
-        storeFeedAdapter = StoreFeedAdapter()
+        val stores = mutableListOf<StoreResponse>()
+        storeFeedAdapter = StoreFeedAdapter(stores)
         recyclerView = view.findViewById(R.id.stores_view)
         recyclerView.apply {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(activity)
-            // TODO uncomment the line below whe Adapter is implemented
-            // adapter = storeFeedAdapter
+            adapter = storeFeedAdapter
         }
         return view
     }
