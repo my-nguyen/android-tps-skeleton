@@ -15,14 +15,19 @@ import com.tps.challenge.R
 import com.tps.challenge.TCApplication
 import com.tps.challenge.network.TPSCallService
 import com.tps.challenge.network.TPSCoroutineService
+import com.tps.challenge.network.TPSRxService
 import com.tps.challenge.network.model.StoreResponse
+import io.reactivex.SingleObserver
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
 import javax.inject.Inject
 
 /**
@@ -41,6 +46,8 @@ class StoreFeedFragment : Fragment() {
     lateinit var callService: TPSCallService
     @Inject
     lateinit var coroutineService: TPSCoroutineService
+    @Inject
+    lateinit var rxService: TPSRxService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         TCApplication.getAppComponent().inject(this)
@@ -68,6 +75,7 @@ class StoreFeedFragment : Fragment() {
 
         // useCallService()
         useCoroutineService()
+        // useRxService()
 
         return view
     }
@@ -90,5 +98,26 @@ class StoreFeedFragment : Fragment() {
             stores.addAll(coroutineService.getStoreFeed(DEFAULT_LATITUDE, DEFAULT_LONGITUDE))
             storeFeedAdapter.notifyDataSetChanged()
         }
+    }
+
+    private fun useRxService() {
+        rxService.getStoreFeed(DEFAULT_LATITUDE, DEFAULT_LONGITUDE)
+            .observeOn(Schedulers.io())
+            .subscribeOn(AndroidSchedulers.mainThread())
+            .subscribe(object: SingleObserver<List<StoreResponse>> {
+                override fun onSubscribe(d: Disposable) {
+                    Log.d(TAG, "onSubscribe")
+                }
+
+                override fun onError(e: Throwable) {
+                    Log.e(TAG, "onError $e")
+                }
+
+                override fun onSuccess(responses: List<StoreResponse>) {
+                    Log.e(TAG, "onSuccess")
+                    stores.addAll(responses)
+                    storeFeedAdapter.notifyDataSetChanged()
+                }
+            })
     }
 }
