@@ -3,6 +3,7 @@ package com.tps.challenge
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import com.tps.challenge.network.TPSCoroutineService
 import dagger.Lazy
 import javax.inject.Inject
 
@@ -21,16 +22,23 @@ import javax.inject.Inject
  *        )
  *    }
  */
-class ViewModelFactory<T: ViewModel>
-@Inject constructor(private val viewModel: Lazy<T>) : ViewModelProvider.Factory {
+/*class ViewModelFactory<T: ViewModel>
+@Inject constructor(private val service: TPSCoroutineService) : ViewModelProvider.Factory {*/
+class ViewModelFactory(private val service: TPSCoroutineService) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T = viewModel.get() as T
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MyViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MyViewModel(service) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
 
     /**
      * Returns an instance of a defined ViewModel class.
      */
-    inline fun <reified R: T> get(viewModelStoreOwner: ViewModelStoreOwner): T {
+    /*inline fun <reified R: T> get(viewModelStoreOwner: ViewModelStoreOwner): T {
         return ViewModelProvider(viewModelStoreOwner, this)[R::class.java]
-    }
+    }*/
 }

@@ -6,13 +6,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.tps.challenge.Constants.DEFAULT_LATITUDE
 import com.tps.challenge.Constants.DEFAULT_LONGITUDE
+import com.tps.challenge.MyViewModel
 import com.tps.challenge.R
 import com.tps.challenge.TCApplication
+import com.tps.challenge.ViewModelFactory
 import com.tps.challenge.network.TPSCallService
 import com.tps.challenge.network.TPSCoroutineService
 import com.tps.challenge.network.TPSRxService
@@ -49,6 +52,10 @@ class StoreFeedFragment : Fragment() {
     @Inject
     lateinit var rxService: TPSRxService
 
+    private val viewModel by viewModels<MyViewModel> {
+        ViewModelFactory(coroutineService)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         TCApplication.getAppComponent().inject(this)
         super.onCreate(savedInstanceState)
@@ -74,8 +81,14 @@ class StoreFeedFragment : Fragment() {
         }
 
         // useCallService()
-        useCoroutineService()
+        // useCoroutineService()
         // useRxService()
+
+        viewModel.getStoreFeed(DEFAULT_LATITUDE, DEFAULT_LONGITUDE)
+        viewModel.stores.observe(viewLifecycleOwner) { list ->
+            stores.addAll(list)
+            storeFeedAdapter.notifyDataSetChanged()
+        }
 
         return view
     }
